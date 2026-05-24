@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>英语单词复习</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f6f8fb 0%, #eef2f7 100%);
+    color: #1f2937;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .app {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 720px;
+    overflow: hidden;
+  }
+  header {
+    padding: 20px 28px;
+    border-bottom: 1px solid #eef0f3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+    color: #111827;
+  }
+  .stats {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    gap: 14px;
+  }
+  .stats span b { color: #2563eb; }
+  main { padding: 32px 28px 28px; }
+
+  /* Home screen */
+  .home { text-align: center; padding: 20px 0 10px; }
+  .home p { color: #6b7280; margin: 10px 0 18px; }
+  .home .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .pending-channel {
+    margin: 16px auto 0;
+    max-width: 460px;
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+    border: 1px solid #fdba74;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .1s, box-shadow .1s;
+  }
+  .pending-channel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(234,88,12,0.18);
+  }
+
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .unit-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+  }
+  .unit-card:hover {
+    background: #eef4ff;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+  }
+  .unit-card .unit-name { font-weight: 600; color: #1f2937; font-size: 14px; }
+  .unit-card .unit-count { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+  .unit-label {
+    display: inline-block;
+    background: #eef4ff;
+    color: #2563eb;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  /* Review screen */
+  .card {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 40px 24px 28px;
+    text-align: center;
+    border: 1px solid #eef0f3;
+    position: relative;
+  }
+  .btn-back {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-back:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
+  }
+  .word {
+    font-size: 44px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .speak-btn {
+    background: #eef4ff;
+    color: #2563eb;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+  }
+  .speak-btn:hover { background: #dbeafe; }
+  .phonetic {
+    font-size: 20px;
+    color: #6b7280;
+    margin-top: 12px;
+    font-family: "Lucida Sans Unicode", "DejaVu Sans", serif;
+  }
+  .hint-box {
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: #fff7ed;
+    color: #9a3412;
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: left;
+    border: 1px solid #fed7aa;
+  }
+  .meaning-box {
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: #ecfdf5;
+    color: #065f46;
+    border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: left;
+    border: 1px solid #a7f3d0;
+  }
+  .meaning-box .pos { color: #047857; font-weight: 600; margin-right: 6px; }
+
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: transform .05s, background .15s, box-shadow .15s;
+  }
+  button:active { transform: translateY(1px); }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-hint { background: #fef3c7; color: #92400e; }
+  .btn-hint:hover { background: #fde68a; }
+  .btn-dont-know { background: #fee2e2; color: #991b1b; }
+  .btn-dont-know:hover { background: #fecaca; }
+  .btn-know { background: #d1fae5; color: #065f46; }
+  .btn-know:hover { background: #a7f3d0; }
+  .btn-next { background: #2563eb; color: #fff; }
+  .btn-next:hover { background: #1d4ed8; }
+  .btn-ghost { background: #f3f4f6; color: #374151; }
+  .btn-ghost:hover { background: #e5e7eb; }
+
+  /* Done screen */
+  .done { text-align: center; padding: 30px 0; }
+  .done .emoji { font-size: 48px; }
+  .done h2 { margin: 10px 0; }
+  .done p { color: #6b7280; }
+
+  /* Manage modal */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(17,24,39,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .modal-mask.open { display: flex; }
+  .modal {
+    background: #fff;
+    width: 100%;
+    max-width: 680px;
+    max-height: 86vh;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eef0f3;
+  }
+  .modal .body { padding: 16px 20px; overflow-y: auto; }
+  .modal .footer {
+    padding: 12px 20px;
+    border-top: 1px solid #eef0f3;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 240px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 13px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    resize: vertical;
+  }
+  .hint-tip { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+  .word-list { font-size: 13px; color: #4b5563; }
+  .word-list-item {
+    padding: 6px 0;
+    border-bottom: 1px dashed #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pending-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 onclick="renderHome()" style="cursor:pointer;" title="返回主菜单">📖 英语单词复习</h1>
+    <div class="stats" id="stats" style="display:none;">
+      <span>剩余：<b id="remaining">0</b></span>
+      <span>已掌握：<b id="known">0</b></span>
+      <span>待复习：<b id="pending">0</b></span>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<!-- 单词管理弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <header><h1 style="font-size:16px;">管理单词表</h1></header>
+    <div class="body">
+      <div class="hint-tip">
+        每行一个单词，格式：<code>word | 音标 | 词性. 中文意思 | 例句（可选，用 ___ 代表单词位置）</code><br>
+        例如：<code>apple | /ˈæpəl/ | n. 苹果 | I eat an ___ every day.</code><br>
+        音标、例句可省略；多个释义可写在一栏。
+      </div>
+      <textarea id="wordInput" spellcheck="false"></textarea>
+      <div style="margin-top:10px;">
+        <button class="btn-ghost" onclick="loadSample()">载入示例单词</button>
+        <button class="btn-ghost" onclick="exportWords()">导出当前</button>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveWords()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 数据 ============ */
+const SAMPLE = `access | /ˈækses/ | n. 访问，进入；通道  v. 访问，获取 | Disabled people should have equal access to public buildings.
+adequate | /ˈædɪkwət/ | adj. 足够的，适当的 | The room was small but adequate for our needs.
+annual | /ˈænjuəl/ | adj. 每年的，年度的 | The company holds an annual general meeting every March.
+apparent | /əˈpærənt/ | adj. 明显的；表面上的 | It became apparent that she had no intention of returning.
+approximate | /əˈprɒksɪmət/ | adj. 大约的  v. 接近 | The approximate cost of the project is two million pounds.
+attitude | /ˈætɪtjuːd/ | n. 态度，看法 | His positive attitude towards work impressed his manager.
+attribute | /əˈtrɪbjuːt/ | v. 把…归因于  n. 属性，特征 | She attributes her success to hard work and good luck.
+civil | /ˈsɪvl/ | adj. 公民的；民事的；文明的 | The country was torn apart by civil war for over a decade.
+code | /kəʊd/ | n. 代码；准则  v. 编码 | All employees must follow the company's code of conduct.
+commit | /kəˈmɪt/ | v. 承诺；犯（罪），做（错事） | The government has committed itself to reducing carbon emissions.
+communicate | /kəˈmjuːnɪkeɪt/ | v. 沟通，交流 | Many animals communicate with each other through sound and gesture.
+concentrate | /ˈkɒnsntreɪt/ | v. 集中，专注 | It is difficult to concentrate when there is so much noise.
+confer | /kənˈfɜː(r)/ | v. 商议，协商；授予 | The president conferred with his advisors before making a decision.
+contrast | /ˈkɒntrɑːst/ | n./v. 对比，对照 | There is a sharp contrast between life in the city and in the countryside.
+cycle | /ˈsaɪkl/ | n. 循环，周期 | The life cycle of a butterfly involves four distinct stages.
+debate | /dɪˈbeɪt/ | n./v. 辩论，讨论 | The new policy has sparked a heated debate among economists.
+despite | /dɪˈspaɪt/ | prep. 尽管，不管 | Despite the heavy rain, the football match continued as planned.
+dimension | /daɪˈmenʃn/ | n. 维度；尺寸；方面 | Technology has added a new dimension to modern education.
+domestic | /dəˈmestɪk/ | adj. 国内的；家庭的 | Domestic flights are usually cheaper than international ones.
+emerge | /ɪˈmɜːdʒ/ | v. 出现，浮现 | New evidence has emerged about the cause of the accident.
+mechanism | /ˈmekənɪzəm/ | n. 机制，机能；机械装置 | The body has a natural mechanism for fighting infection.
+obvious | /ˈɒbviəs/ | adj. 明显的，显而易见的 | It was obvious from her expression that she was unhappy.
+occupy | /ˈɒkjupaɪ/ | v. 占据，占领 | Reading occupies most of her free time at the weekend.
+option | /ˈɒpʃn/ | n. 选项，选择 | Students have the option of studying abroad in their third year.
+output | /ˈaʊtpʊt/ | n. 产量；输出 | Factory output has risen by 10% over the last six months.
+overall | /ˌəʊvərˈɔːl/ | adj. 总体的，全面的  adv. 总的来说 | The overall standard of the candidates was very high.
+subsequent | /ˈsʌbsɪkwənt/ | adj. 随后的，后来的 | The book and its subsequent editions sold millions of copies.
+sum | /sʌm/ | n. 总数；金额  v. 总计 | A large sum of money was raised for charity at the event.
+summary | /ˈsʌməri/ | n. 摘要，概要 | Please write a brief summary of the article in your own words.
+undertake | /ˌʌndəˈteɪk/ | v. 承担，从事；许诺 | The university has undertaken a major research project on climate.
+isolate | /ˈaɪsəleɪt/ | v. 隔离，孤立 | Patients with the virus must be isolated from others immediately.
+cultivate | /ˈkʌltɪveɪt/ | v. 培养；耕种 | Farmers have cultivated this land for over three hundred years.
+belong | /bɪˈlɒŋ/ | v. 属于 | These ancient artefacts belong in a museum, not a private collection.
+inclusive | /ɪnˈkluːsɪv/ | adj. 包容的；包括的 | The school aims to create an inclusive environment for all students.
+rental | /ˈrentl/ | n. 租金；租赁 | The monthly rental for the apartment is around 1,500 dollars.
+marketplace | /ˈmɑːkɪtpleɪs/ | n. 市场；集市 | Small businesses struggle to compete in the global marketplace.
+initiative | /ɪˈnɪʃətɪv/ | n. 主动权；倡议 | The government launched a new initiative to reduce youth unemployment.
+emergency | /ɪˈmɜːdʒənsi/ | n. 紧急情况 | In an emergency, dial 999 for police, fire or ambulance.
+greenery | /ˈɡriːnəri/ | n. 绿色植物，绿叶 | The garden was full of lush greenery and colourful flowers.
+shade | /ʃeɪd/ | n. 阴凉处；色度 | We sat in the shade of a large oak tree to escape the heat.
+pavement | /ˈpeɪvmənt/ | n. 人行道，路面 | Cyclists should not ride on the pavement in busy city centres.
+liveable | /ˈlɪvəbl/ | adj. 适宜居住的 | Vienna is often ranked as one of the most liveable cities in the world.
+lane | /leɪn/ | n. 小巷，车道 | A narrow country lane led down to the old farmhouse.
+pedestrian | /pəˈdestriən/ | n. 行人  adj. 步行的 | The city centre has been turned into a pedestrian zone.
+socialise | /ˈsəʊʃəlaɪz/ | v. 交际，社交 | Many students join clubs as a way to socialise and make friends.
+block | /blɒk/ | n. 街区；块  v. 阻塞 | A fallen tree blocked the road for several hours this morning.
+volunteer | /ˌvɒlənˈtɪə(r)/ | n. 志愿者  v. 自愿 | She works as a volunteer at the local hospital every weekend.
+immerse | /ɪˈmɜːs/ | v. 使沉浸；使浸泡 | The best way to learn a language is to immerse yourself in the culture.
+pledge | /pledʒ/ | n./v. 誓言，保证 | The wealthy donor pledged a million dollars to the charity.
+expose | /ɪkˈspəʊz/ | v. 暴露，揭露 | The newspaper exposed corruption at the highest levels of government.
+alumni | /əˈlʌmnaɪ/ | n. 校友（复数） | The university often invites successful alumni to give lectures.
+proponent | /prəˈpəʊnənt/ | n. 支持者，拥护者 | She is a leading proponent of renewable energy in the region.
+opponent | /əˈpəʊnənt/ | n. 对手，反对者 | His opponent in the final was a former world champion.
+mentor | /ˈmentɔː(r)/ | n. 导师，良师益友 | Every new employee is assigned a mentor for their first year.
+awareness | /əˈweənəs/ | n. 意识，觉察 | The campaign aims to raise public awareness of mental health issues.
+species | /ˈspiːʃiːz/ | n. 物种 | Many species of birds are now endangered due to habitat loss.
+thrive | /θraɪv/ | v. 茁壮成长；繁荣 | Small businesses are thriving in this part of the country.
+ecosystem | /ˈiːkəʊsɪstəm/ | n. 生态系统 | Coral reefs support one of the most diverse ecosystems on Earth.
+advocate | /ˈædvəkeɪt/ | v. 提倡  n. 拥护者 | Many doctors advocate a balanced diet and regular exercise.
+fund | /fʌnd/ | n. 基金；资金  v. 资助 | The project is funded entirely by private donations.
+budget | /ˈbʌdʒɪt/ | n. 预算  v. 制定预算 | The school has a limited budget for sports equipment this year.
+dominate | /ˈdɒmɪneɪt/ | v. 支配，统治 | A few large companies dominate the global software industry.
+conflict | /ˈkɒnflɪkt/ | n./v. 冲突，矛盾 | There is often conflict between economic growth and environmental protection.
+parallel | /ˈpærəlel/ | adj. 平行的；相似的 | The two roads run parallel to each other for several kilometres.
+parameter | /pəˈræmɪtə(r)/ | n. 参数；范围 | The study was carried out within strict scientific parameters.
+phase | /feɪz/ | n. 阶段，时期 | The first phase of the project will be completed by the end of June.
+predict | /prɪˈdɪkt/ | v. 预测，预言 | Scientists predict that global temperatures will continue to rise.
+principal | /ˈprɪnsəpl/ | adj. 主要的  n. 校长 | The principal cause of the accident was driver fatigue.
+prior | /ˈpraɪə(r)/ | adj. 先前的；优先的 | No prior experience is required for this entry-level position.
+professional | /prəˈfeʃənl/ | adj. 专业的  n. 专业人员 | She gave up her amateur status to become a professional athlete.
+project | /ˈprɒdʒekt/ | n. 项目  v. 投射；预计 | The construction project is expected to take three years to complete.
+promote | /prəˈməʊt/ | v. 促进；提升；推广 | Regular exercise promotes both physical and mental well-being.
+regime | /reɪˈʒiːm/ | n. 政权；制度 | The new regime introduced sweeping reforms in education and healthcare.
+resolve | /rɪˈzɒlv/ | v. 解决；决定  n. 决心 | They met several times to try to resolve their differences.
+retain | /rɪˈteɪn/ | v. 保留，保持 | Despite the heat, the soil retains moisture for several days.
+series | /ˈsɪəriːz/ | n. 系列，连续 | The author has just published the third book in the series.
+statistic | /stəˈtɪstɪk/ | n. 统计数字 | Recent statistics show a sharp rise in online shopping among teenagers.
+status | /ˈsteɪtəs/ | n. 地位；状态 | Owning a car was once considered a symbol of social status.
+stress | /stres/ | n. 压力  v. 强调 | The teacher stressed the importance of regular revision before exams.
+ethical | /ˈeθɪkl/ | adj. 伦理的，道德的 | The use of animals in research raises serious ethical questions.
+prohibit | /prəˈhɪbɪt/ | v. 禁止 | Smoking is strictly prohibited in all public buildings in the country.
+commitment | /kəˈmɪtmənt/ | n. 承诺；投入 | The job requires a long-term commitment from anyone who applies.
+perspective | /pəˈspektɪv/ | n. 视角，观点 | Travelling abroad gave her a fresh perspective on her own culture.
+medical | /ˈmedɪkl/ | adj. 医学的，医疗的 | Medical research has made huge progress in treating cancer.
+authority | /ɔːˈθɒrəti/ | n. 权威；当局 | The local authority is responsible for maintaining public roads.
+strategic | /strəˈtiːdʒɪk/ | adj. 战略的 | The company is making strategic investments in renewable energy.
+dilemma | /dɪˈlemə/ | n. 困境，进退两难 | Working parents often face the dilemma of balancing family and career.
+nuanced | /ˈnjuːɑːnst/ | adj. 微妙的，细致入微的 | She gave a nuanced analysis of the political situation.
+controversial | /ˌkɒntrəˈvɜːʃl/ | adj. 有争议的 | Genetically modified food remains a highly controversial topic.
+misinformation | /ˌmɪsɪnfəˈmeɪʃn/ | n. 错误信息 | Social media has accelerated the spread of misinformation online.
+principle | /ˈprɪnsəpl/ | n. 原则，原理 | The course teaches the basic principles of economics and finance.
+curate | /kjʊəˈreɪt/ | v. 策划，组织（展览等） | She has curated several exhibitions at the National Gallery.
+authenticity | /ˌɔːθenˈtɪsəti/ | n. 真实性；可靠性 | Experts were called in to verify the authenticity of the painting.
+welfare | /ˈwelfeə(r)/ | n. 福利；幸福 | The government is committed to improving the welfare of its citizens.
+implication | /ˌɪmplɪˈkeɪʃn/ | n. 含义；影响 | The implications of the new law are still being debated.
+enable | /ɪˈneɪbl/ | v. 使能够；启用 | The scholarship enabled her to study at a top university abroad.
+error | /ˈerə(r)/ | n. 错误 | A small error in the calculation led to a serious accident.
+ethnic | /ˈeθnɪk/ | adj. 民族的，种族的 | The country is home to over fifty different ethnic groups.
+goal | /ɡəʊl/ | n. 目标；进球 | Her main goal in life is to become a successful surgeon.
+grant | /ɡrɑːnt/ | v. 授予；承认  n. 拨款 | The university was granted funding for a new research centre.
+hence | /hens/ | adv. 因此 | She is fluent in five languages, hence her success as a translator.
+hypothesis | /haɪˈpɒθəsɪs/ | n. 假设 | The scientist's hypothesis was supported by experimental evidence.
+implement | /ˈɪmplɪment/ | v. 实施，执行 | The new policy will be implemented at the beginning of next year.
+implicate | /ˈɪmplɪkeɪt/ | v. 牵涉；暗示 | Two senior officials were implicated in the financial scandal.
+impose | /ɪmˈpəʊz/ | v. 强加；征收 | The government has imposed strict regulations on air pollution.
+integrate | /ˈɪntɪɡreɪt/ | v. 整合，融合 | Immigrants often find it hard to integrate into a new society.
+internal | /ɪnˈtɜːnl/ | adj. 内部的 | The company conducted an internal investigation into the matter.
+investigate | /ɪnˈvestɪɡeɪt/ | v. 调查 | Police are investigating the cause of the fire at the warehouse.
+job | /dʒɒb/ | n. 工作 | She is looking for a part-time job to help pay for her studies.
+label | /ˈleɪbl/ | n. 标签  v. 贴标签 | Always read the label carefully before taking any medication.
+academy | /əˈkædəmi/ | n. 学院；学会 | He was elected a member of the Royal Academy of Sciences.
+adjust | /əˈdʒʌst/ | v. 调整，适应 | It took her a few months to adjust to life in a new country.
+alter | /ˈɔːltə(r)/ | v. 改变，改动 | The new evidence did not alter the jury's final verdict.
+amend | /əˈmend/ | v. 修订，修正 | Parliament voted to amend the law on data protection.
+aware | /əˈweə(r)/ | adj. 意识到的 | Consumers are increasingly aware of the impact of plastic on the environment.
+capacity | /kəˈpæsəti/ | n. 容量；能力 | The stadium has a seating capacity of over 80,000 spectators.
+challenge | /ˈtʃælɪndʒ/ | n. 挑战  v. 挑战 | Climate change is one of the greatest challenges of our time.
+clause | /klɔːz/ | n. 条款；从句 | There is a clause in the contract that allows either party to cancel.
+compound | /ˈkɒmpaʊnd/ | n. 化合物  adj. 复合的 | Water is a chemical compound made of hydrogen and oxygen.
+consult | /kənˈsʌlt/ | v. 咨询，请教 | You should consult a doctor if the symptoms continue for more than a week.
+contact | /ˈkɒntækt/ | n./v. 联系，接触 | Please contact the office if you have any further questions.
+decline | /dɪˈklaɪn/ | v. 下降；拒绝 | There has been a steady decline in birth rates over the past decade.
+discrete | /dɪˈskriːt/ | adj. 离散的，分立的 | The course is divided into six discrete units, each with its own theme.
+draft | /drɑːft/ | n. 草稿  v. 起草 | She is working on the first draft of her novel at the moment.
+energy | /ˈenədʒi/ | n. 能量；精力 | The country is investing heavily in renewable energy sources.
+enforce | /ɪnˈfɔːs/ | v. 执行，强制 | It is the duty of the police to enforce the law without bias.
+entity | /ˈentəti/ | n. 实体 | The two companies are now legally separate entities.
+equivalent | /ɪˈkwɪvələnt/ | adj. 等同的  n. 等价物 | One pound is roughly equivalent to about 1.20 euros at the moment.
+corporate | /ˈkɔːpərət/ | adj. 公司的，企业的 | The corporate world is becoming increasingly competitive and global.
+intertwine | /ˌɪntəˈtwaɪn/ | v. 缠结，交织 | Their lives became intertwined after they met at university.
+obligation | /ˌɒblɪˈɡeɪʃn/ | n. 义务，责任 | Parents have a moral obligation to care for their children.
+quantify | /ˈkwɒntɪfaɪ/ | v. 量化 | It is difficult to quantify the benefits of art education in schools.
+tangible | /ˈtændʒəbl/ | adj. 有形的；明确的 | The project has produced tangible results in just six months.
+altruistic | /ˌæltruˈɪstɪk/ | adj. 利他的，无私的 | Her decision to donate a kidney was a truly altruistic act.
+compliance | /kəmˈplaɪəns/ | n. 遵守，服从 | All staff must ensure full compliance with health and safety regulations.
+genuinely | /ˈdʒenjuɪnli/ | adv. 真诚地，确实地 | She was genuinely surprised when she won the prize.
+prioritise | /praɪˈɒrətaɪz/ | v. 优先处理 | You need to prioritise your tasks to meet the tight deadline.
+exploit | /ɪkˈsplɔɪt/ | v. 开发；剥削 | The company has been accused of exploiting cheap labour overseas.
+underestimate | /ˌʌndərˈestɪmeɪt/ | v. 低估 | Never underestimate the power of a good first impression.
+transparent | /trænsˈpærənt/ | adj. 透明的；明显的 | The government promised to make its decisions more transparent.
+niche | /niːʃ/ | n. 利基；合适位置 | The small company has found a profitable niche in the luxury market.
+regulatory | /ˈreɡjələtəri/ | adj. 监管的 | Banks must comply with strict regulatory requirements at all times.
+evolution | /ˌiːvəˈluːʃn/ | n. 进化，演变 | Darwin's theory of evolution changed our understanding of biology.
+evolve | /ɪˈvɒlv/ | v. 进化，发展 | The English language has evolved considerably over the past 500 years.
+expand | /ɪkˈspænd/ | v. 扩展，膨胀 | The company plans to expand into the Asian market next year.
+external | /ɪkˈstɜːnl/ | adj. 外部的 | The report was reviewed by an external panel of experts.
+facilitate | /fəˈsɪlɪteɪt/ | v. 促进，使容易 | Modern technology facilitates communication between distant offices.
+fundamental | /ˌfʌndəˈmentl/ | adj. 基本的，根本的 | There is a fundamental difference between the two political parties.
+generate | /ˈdʒenəreɪt/ | v. 产生，生成 | Wind turbines can generate enough electricity to power a small town.
+generation | /ˌdʒenəˈreɪʃn/ | n. 一代；产生 | The younger generation tends to be more environmentally conscious.
+image | /ˈɪmɪdʒ/ | n. 图像；形象 | The company is trying hard to improve its public image.
+liberal | /ˈlɪbərəl/ | adj. 自由的；慷慨的 | The newspaper has a strongly liberal editorial stance.
+licence | /ˈlaɪsns/ | n. 执照，许可证 | You need a driving licence to operate a vehicle on public roads.
+logic | /ˈlɒdʒɪk/ | n. 逻辑 | I can't follow the logic of his argument at all.
+margin | /ˈmɑːdʒɪn/ | n. 边缘；利润 | The team won the match by a narrow margin of two points.
+mental | /ˈmentl/ | adj. 精神的，心理的 | Long working hours can have a serious impact on mental health.
+modify | /ˈmɒdɪfaɪ/ | v. 修改，调整 | The car has been modified to run on electric power instead of petrol.
+monitor | /ˈmɒnɪtə(r)/ | v. 监控  n. 显示器 | Doctors are closely monitoring the patient's condition overnight.
+network | /ˈnetwɜːk/ | n. 网络 | The city has an excellent public transport network.
+notion | /ˈnəʊʃn/ | n. 概念，观念 | He rejected the notion that money brings happiness.
+objective | /əbˈdʒektɪv/ | n. 目标  adj. 客观的 | The main objective of the meeting is to agree on a budget.
+pursue | /pəˈsjuː/ | v. 追求，从事 | After graduation she decided to pursue a career in journalism.
+ratio | /ˈreɪʃiəʊ/ | n. 比率 | The teacher-to-student ratio at the school is unusually high.
+reject | /rɪˈdʒekt/ | v. 拒绝 | The committee rejected the proposal on financial grounds.
+revenue | /ˈrevənjuː/ | n. 收入，收益 | Advertising is the main source of revenue for most websites.
+stable | /ˈsteɪbl/ | adj. 稳定的 | The patient's condition is now stable after the operation.
+style | /staɪl/ | n. 风格 | Her writing style is clear, simple and easy to follow.
+substitute | /ˈsʌbstɪtjuːt/ | n./v. 替代品；替代 | You can substitute olive oil for butter in most recipes.
+sustain | /səˈsteɪn/ | v. 维持，承受 | The economy cannot sustain such high levels of growth for long.
+symbol | /ˈsɪmbl/ | n. 符号，象征 | The dove is widely recognised as a symbol of peace.
+target | /ˈtɑːɡɪt/ | n. 目标  v. 瞄准 | The company has set a target of doubling sales within five years.
+transit | /ˈtrænzɪt/ | n. 运输；过境 | The goods were damaged in transit between the factory and warehouse.
+trend | /trend/ | n. 趋势 | There is a growing trend among young people to work from home.
+version | /ˈvɜːʃn/ | n. 版本 | The latest version of the software includes several new features.
+whereas | /ˌweərˈæz/ | conj. 然而，鉴于 | He likes football, whereas his brother prefers basketball.
+threaten | /ˈθretn/ | v. 威胁 | Pollution continues to threaten the survival of many marine species.
+displace | /dɪsˈpleɪs/ | v. 取代；使迁移 | Thousands of families were displaced by the recent flooding.
+marine | /məˈriːn/ | adj. 海洋的 | Plastic waste is having a devastating effect on marine life.
+sanctuary | /ˈsæŋktʃuəri/ | n. 庇护所；保护区 | The forest is now a protected sanctuary for endangered birds.
+penalty | /ˈpenəlti/ | n. 处罚，罚款 | The penalty for late payment is an additional ten per cent charge.
+framework | /ˈfreɪmwɜːk/ | n. 框架，构架 | The book provides a useful framework for analysing the problem.
+coordinate | /kəʊˈɔːdɪneɪt/ | v. 协调  n. 坐标 | The charity coordinates the work of hundreds of volunteers.
+toxic | /ˈtɒksɪk/ | adj. 有毒的 | The factory was found to be releasing toxic chemicals into the river.
+deforestation | /ˌdiːˌfɒrɪˈsteɪʃn/ | n. 砍伐森林 | Deforestation is one of the main causes of global climate change.
+reforestation | /ˌriːˌfɒrɪˈsteɪʃn/ | n. 重新造林 | The government has launched an ambitious reforestation programme.
+sustainable | /səˈsteɪnəbl/ | adj. 可持续的 | We need to develop more sustainable forms of agriculture.
+certify | /ˈsɜːtɪfaɪ/ | v. 证明，认证 | All organic products must be certified by an independent body.
+alternative | /ɔːlˈtɜːnətɪv/ | n. 替代方案  adj. 可替代的 | Solar power is a clean alternative to fossil fuels.
+conservation | /ˌkɒnsəˈveɪʃn/ | n. 保护，保存 | Wildlife conservation has become a major global concern.
+degradation | /ˌdeɡrəˈdeɪʃn/ | n. 退化，降解 | Environmental degradation threatens the future of our planet.
+eliminate | /ɪˈlɪmɪneɪt/ | v. 消除，排除 | The new policy aims to eliminate poverty within twenty years.
+decompose | /ˌdiːkəmˈpəʊz/ | v. 分解，腐烂 | Plastic bags can take hundreds of years to decompose in landfill.
+contamination | /kənˌtæmɪˈneɪʃn/ | n. 污染 | The contamination of drinking water poses a serious health risk.
+creature | /ˈkriːtʃə(r)/ | n. 生物，动物 | Many strange creatures live deep in the ocean.
+regulate | /ˈreɡjuleɪt/ | v. 管制，调节 | The body uses sweat to regulate its temperature in hot weather.
+excessive | /ɪkˈsesɪv/ | adj. 过度的 | Excessive use of mobile phones can damage your eyesight.
+secure | /sɪˈkjʊə(r)/ | adj. 安全的  v. 确保，固定 | She finally secured a permanent job after years of temporary work.
+extinction | /ɪkˈstɪŋkʃn/ | n. 灭绝 | Many species of animals are now on the brink of extinction.
+entire | /ɪnˈtaɪə(r)/ | adj. 整个的 | She spent the entire weekend revising for her final exam.
+survival | /səˈvaɪvl/ | n. 生存 | Water is essential for the survival of all living organisms.
+nursery | /ˈnɜːsəri/ | n. 苗圃；托儿所 | Their youngest child started at the local nursery last September.
+collapse | /kəˈlæps/ | v./n. 倒塌，崩溃 | The roof of the old building collapsed under the weight of the snow.
+bleach | /bliːtʃ/ | v. 漂白  n. 漂白剂 | Rising sea temperatures are causing coral reefs to bleach and die.
+promising | /ˈprɒmɪsɪŋ/ | adj. 有前途的，有希望的 | She is one of the most promising young writers of her generation.
+crucial | /ˈkruːʃl/ | adj. 至关重要的 | It is crucial to read the instructions carefully before starting.
+gear | /ɡɪə(r)/ | n. 齿轮；装备  v. 调整 | The training course is geared towards beginners with no experience.
+scale | /skeɪl/ | n. 规模；秤；刻度 | No one had expected the disaster on such a massive scale.
+restore | /rɪˈstɔː(r)/ | v. 恢复，修复 | The old church has been beautifully restored to its original state.
+orient | /ˈɔːrient/ | v. 定位；使适应 | The induction programme helps new students orient themselves in the city.
+precise | /prɪˈsaɪs/ | adj. 精确的 | Scientists need to make precise measurements for the experiment to work.
+prime | /praɪm/ | adj. 主要的；最好的  n. 全盛期 | His prime concern is the welfare of his family.
+psychology | /saɪˈkɒlədʒi/ | n. 心理学 | She studied psychology at university and now works as a counsellor.
+transition | /trænˈzɪʃn/ | n. 过渡，转变 | The transition from school to university can be difficult for many students.
+abstract | /ˈæbstrækt/ | adj. 抽象的  n. 摘要 | Children often find abstract concepts like time hard to understand.
+accurate | /ˈækjərət/ | adj. 准确的 | The newspaper apologised for failing to provide accurate information.
+acknowledge | /əkˈnɒlɪdʒ/ | v. 承认；致谢 | He refused to acknowledge that he had made a serious mistake.
+aggregate | /ˈæɡrɪɡət/ | n. 总数  adj. 总计的 | The aggregate value of the exports rose by eight per cent last year.
+allocate | /ˈæləkeɪt/ | v. 分配 | The government has allocated extra funds to primary education.
+assign | /əˈsaɪn/ | v. 分配；指派 | Each student was assigned a different research topic for the term.
+attach | /əˈtætʃ/ | v. 附上，使附属 | Please attach a recent photograph to your application form.
+author | /ˈɔːθə(r)/ | n. 作者 | She is the author of several best-selling novels for children.
+bond | /bɒnd/ | n. 联系；债券  v. 结合 | There is a strong bond between the twin sisters.
+brief | /briːf/ | adj. 简短的  n. 摘要 | The manager gave a brief overview of the company's plans for the year.
+capable | /ˈkeɪpəbl/ | adj. 有能力的 | She is more than capable of handling the new responsibilities.
+cite | /saɪt/ | v. 引用 | The researcher cited several recent studies to support her argument.
+cooperate | /kəʊˈɒpəreɪt/ | v. 合作 | The two countries have agreed to cooperate on climate change issues.
+discriminate | /dɪˈskrɪmɪneɪt/ | v. 歧视；区分 | It is illegal to discriminate against employees on the basis of age.
+display | /dɪˈspleɪ/ | n./v. 展示，显示 | The museum has a fascinating display of ancient Egyptian artefacts.
+diverse | /daɪˈvɜːs/ | adj. 多样的 | London is home to people from extremely diverse cultural backgrounds.
+domain | /dəˈmeɪn/ | n. 领域；域名 | Artificial intelligence is now her main domain of research.
+edit | /ˈedɪt/ | v. 编辑 | She spent the weekend editing the first draft of her thesis.
+enhance | /ɪnˈhɑːns/ | v. 提高，增强 | Studying abroad can greatly enhance your career prospects.
+estate | /ɪˈsteɪt/ | n. 房地产；财产 | The family owns a large country estate in the south of England.
+missions | /ˈmɪʃnz/ | n. 任务，使命（复数） | Space missions to Mars are becoming increasingly ambitious.
+universe | /ˈjuːnɪvɜːs/ | n. 宇宙 | Astronomers believe the universe is still expanding today.
+advancement | /ədˈvɑːnsmənt/ | n. 进步，发展 | Recent advancements in medical technology have saved countless lives.
+inspiration | /ˌɪnspəˈreɪʃn/ | n. 灵感，启发 | The artist drew inspiration from the landscapes of her childhood.
+satellite | /ˈsætəlaɪt/ | n. 卫星 | The weather forecast relies on data from a network of satellites.
+backup | /ˈbækʌp/ | n. 备份；支援 | Always keep a backup copy of important files on a separate drive.
+agency | /ˈeɪdʒənsi/ | n. 机构，代理 | She found her current job through a recruitment agency.
+progress | /ˈprəʊɡres/ | n./v. 进展，进步 | The students have made remarkable progress in just a few months.
+oppose | /əˈpəʊz/ | v. 反对 | Many local residents oppose the construction of the new airport.
+atmosphere | /ˈætməsfɪə(r)/ | n. 大气；气氛 | Carbon dioxide levels in the atmosphere have risen sharply.
+exceed | /ɪkˈsiːd/ | v. 超过 | The cost of the project has already exceeded the original budget.
+expert | /ˈekspɜːt/ | n. 专家 | Experts agree that early intervention is the key to success.
+explicit | /ɪkˈsplɪsɪt/ | adj. 明确的，清晰的 | The teacher gave very explicit instructions about the homework.
+federal | /ˈfedərəl/ | adj. 联邦的 | The federal government has announced new tax measures this week.
+fee | /fiː/ | n. 费用 | The annual membership fee for the gym is two hundred pounds.
+flexible | /ˈfleksəbl/ | adj. 灵活的 | The company offers flexible working hours to all its employees.
+furthermore | /ˌfɜːðəˈmɔː(r)/ | adv. 此外 | The plan is too expensive; furthermore, it is unlikely to succeed.
+gender | /ˈdʒendə(r)/ | n. 性别 | The school promotes gender equality in all aspects of education.
+ignorant | /ˈɪɡnərənt/ | adj. 无知的 | Many people remain ignorant of the basic facts about climate change.
+incentive | /ɪnˈsentɪv/ | n. 激励，刺激 | Tax breaks are used as an incentive to attract foreign investment.
+incidence | /ˈɪnsɪdəns/ | n. 发生率 | The incidence of obesity among children has risen sharply.
+incorporate | /ɪnˈkɔːpəreɪt/ | v. 合并，纳入 | The new design incorporates several environmentally friendly features.
+index | /ˈɪndeks/ | n. 索引；指数 | The consumer price index has risen by three per cent this year.
+inhibit | /ɪnˈhɪbɪt/ | v. 抑制，阻碍 | A lack of confidence can inhibit a student's progress in language learning.
+initiate | /ɪˈnɪʃieɪt/ | v. 开始，发起 | The university initiated a new exchange programme with Japan.
+input | /ˈɪnpʊt/ | n. 输入；投入 | We would welcome your input on the new training programme.
+instruct | /ɪnˈstrʌkt/ | v. 指示；教授 | Staff are instructed to wear a uniform at all times.
+intelligent | /ɪnˈtelɪdʒənt/ | adj. 聪明的 | Dolphins are widely regarded as highly intelligent animals.
+interval | /ˈɪntəvl/ | n. 间隔，间隙 | The buses run at regular intervals throughout the day.
+lecture | /ˈlektʃə(r)/ | n. 讲座；演讲 | She gave a fascinating lecture on modern art history.
+vocational | /vəʊˈkeɪʃənl/ | adj. 职业的 | The college offers a wide range of vocational training courses.
+safety net | /ˈseɪfti net/ | n. 安全保障，安全网 | Unemployment benefits provide a vital safety net for many families.
+overwhelm | /ˌəʊvəˈwelm/ | v. 压倒，使不知所措 | She was overwhelmed by the response to her charity appeal.
+mutual respect | /ˈmjuːtʃuəl rɪˈspekt/ | n. 相互尊重 | A successful partnership depends on mutual respect and trust.
+holistic | /həʊˈlɪstɪk/ | adj. 整体的 | The school takes a holistic approach to children's education.
+well-being | /ˌwelˈbiːɪŋ/ | n. 幸福，健康 | Regular exercise improves both physical and mental well-being.
+tuition fees | /tjuˈɪʃn fiːz/ | n. 学费 | Rising tuition fees are forcing many students into long-term debt.
+social inequality | /ˈsəʊʃl ˌɪnɪˈkwɒləti/ | n. 社会不平等 | Social inequality remains one of the biggest challenges facing the country.
+refrain | /rɪˈfreɪn/ | v. 克制，避免 | Passengers are kindly asked to refrain from smoking on board.
+profession | /prəˈfeʃn/ | n. 职业，专业 | Teaching is often described as one of the most rewarding professions.
+kinaesthetic | /ˌkɪnəsˈθetɪk/ | adj. 动觉的 | Some students are kinaesthetic learners and prefer hands-on activities.
+exposure | /ɪkˈspəʊʒə(r)/ | n. 暴露；接触 | Long exposure to the sun can seriously damage your skin.
+unique | /juˈniːk/ | adj. 独特的 | Each child has a unique way of expressing themselves.
+motivate | /ˈməʊtɪveɪt/ | v. 激励，激发 | Good teachers know how to motivate even the most reluctant students.
+underlying | /ˌʌndəˈlaɪɪŋ/ | adj. 潜在的，根本的 | The doctors are trying to identify the underlying cause of the illness.
+differentiate | /ˌdɪfəˈrenʃieɪt/ | v. 区分，辨别 | It is sometimes difficult to differentiate between the two species.
+auditory | /ˈɔːdətri/ | adj. 听觉的 | Auditory learners tend to remember information better when they hear it.
+migrate | /maɪˈɡreɪt/ | v. 迁徙，移居 | Many birds migrate south for the winter every year.
+minimum | /ˈmɪnɪməm/ | n./adj. 最小（的） | The minimum age for getting a driving licence in the UK is seventeen.
+ministry | /ˈmɪnɪstri/ | n. 部，部门 | The Ministry of Education has announced new policies for primary schools.
+motive | /ˈməʊtɪv/ | n. 动机 | The police are still trying to determine the motive for the crime.
+neutral | /ˈnjuːtrəl/ | adj. 中立的 | Switzerland has remained neutral in international conflicts for centuries.
+nevertheless | /ˌnevəðəˈles/ | adv. 然而，尽管如此 | The work is hard; nevertheless, she enjoys it very much.
+overseas | /ˌəʊvəˈsiːz/ | adv. 海外  adj. 海外的 | She decided to continue her studies overseas after graduation.
+precede | /prɪˈsiːd/ | v. 在…之前 | A short introduction will precede the main speech this evening.
+presume | /prɪˈzjuːm/ | v. 假定，推测 | I presume you have read the report before today's meeting.
+rational | /ˈræʃnəl/ | adj. 理性的 | There must be a rational explanation for her strange behaviour.
+recover | /rɪˈkʌvə(r)/ | v. 恢复，找回 | It took him several weeks to fully recover from the operation.
+reveal | /rɪˈviːl/ | v. 揭示，显示 | The survey revealed that most parents support the new policy.
+scope | /skəʊp/ | n. 范围；机会 | The scope of the project is wider than we originally thought.
+subsidy | /ˈsʌbsədi/ | n. 补贴，津贴 | Farmers receive government subsidies to help them through difficult years.
+tape | /teɪp/ | n. 带子；胶带 | He used a piece of tape to fix the broken page back into the book.
+trace | /treɪs/ | v. 追踪  n. 痕迹 | Police were unable to trace the owner of the abandoned vehicle.
+transform | /trænsˈfɔːm/ | v. 转变，转化 | The internet has completely transformed the way we live and work.
+transport | /ˈtrænspɔːt/ | n./v. 运输 | Public transport in the city is reliable, cheap and efficient.
+underlie | /ˌʌndəˈlaɪ/ | v. 构成…的基础 | Several factors underlie the recent rise in unemployment.
+utilize | /ˈjuːtəlaɪz/ | v. 利用 | The factory utilizes the latest technology to reduce energy use.
+marginalized | /ˈmɑːdʒɪnəlaɪzd/ | adj. 边缘化的 | The campaign aims to support marginalized groups in society.
+instructor | /ɪnˈstrʌktə(r)/ | n. 教练，讲师 | Our driving instructor was patient and very experienced.
+mobility | /məʊˈbɪləti/ | n. 流动性，移动性 | Social mobility has decreased significantly in recent decades.
+undermine | /ˌʌndəˈmaɪn/ | v. 削弱，破坏 | Constant criticism can undermine a child's confidence and self-esteem.
+motivation | /ˌməʊtɪˈveɪʃn/ | n. 动力，动机 | Strong motivation is the key to success in any field of study.
+attainment | /əˈteɪnmənt/ | n. 达到，成就 | The school is proud of the academic attainment of its students.
+autonomy | /ɔːˈtɒnəmi/ | n. 自治，自主权 | The region was granted greater autonomy from the central government.
+supervision | /ˌsuːpəˈvɪʒn/ | n. 监督，管理 | Young children should never play near water without adult supervision.
+navigate | /ˈnævɪɡeɪt/ | v. 导航，引导 | Sailors once used the stars to navigate across the open sea.
+proficiency | /prəˈfɪʃnsi/ | n. 熟练，精通 | A high level of proficiency in English is required for the job.
+competence | /ˈkɒmpɪtəns/ | n. 能力，胜任 | She handled the difficult situation with great professional competence.
+discern | /dɪˈsɜːn/ | v. 辨别，识别 | It is hard to discern any real difference between the two products.
+coverage | /ˈkʌvərɪdʒ/ | n. 覆盖范围；报道 | The wedding received extensive media coverage around the world.
+digital literacy | /ˈdɪdʒɪtl ˈlɪtərəsi/ | n. 数字素养 | Schools should focus more on developing students' digital literacy.
+reputable | /ˈrepjətəbl/ | adj. 声誉好的 | Always buy electronic goods from a reputable retailer with good reviews.
+sponsor | /ˈspɒnsə(r)/ | n./v. 赞助商；赞助 | A major bank has agreed to sponsor the children's tennis tournament.
+drastically | /ˈdræstɪkli/ | adv. 急剧地，大幅地 | Air pollution levels have drastically decreased since the new law was passed.
+radiation | /ˌreɪdiˈeɪʃn/ | n. 辐射 | Exposure to high levels of radiation can cause serious health problems.
+forecast | /ˈfɔːkɑːst/ | n./v. 预测，预报 | The weather forecast predicts heavy rain for the entire weekend.
+critic | /ˈkrɪtɪk/ | n. 批评家，评论家 | Film critics have praised her latest performance as outstanding.
+renowned | /rɪˈnaʊnd/ | adj. 著名的 | The city is renowned for its impressive architecture and rich history.
+launch | /lɔːntʃ/ | v. 发起；发射 | The company is about to launch a new range of electric vehicles.
+over-engineered | /ˌəʊvər ˈendʒɪnɪəd/ | adj. 过度设计的 | Many critics felt the product was over-engineered and unnecessarily complex.
+layoff | /ˈleɪɒf/ | n. 裁员，解雇 | The factory announced massive layoffs due to falling demand.
+publicity | /pʌbˈlɪsəti/ | n. 宣传，公众的注意 | The film attracted a huge amount of publicity before its release.
+capital | /ˈkæpɪtl/ | n. 首都；资本 | Paris is the capital and largest city of France.
+crowdfunding | /ˈkraʊdfʌndɪŋ/ | n. 众筹 | They raised the money through a crowdfunding campaign on the internet.
+dynamic | /daɪˈnæmɪk/ | adj. 动态的；有活力的 | She is a dynamic young leader with fresh ideas and great energy.
+turnover | /ˈtɜːnəʊvə(r)/ | n. 营业额；人员流动率 | The company has an annual turnover of over fifty million pounds.
+apprenticeship | /əˈprentɪʃɪp/ | n. 学徒期 | He completed a four-year apprenticeship as an electrician.
+attributed | /əˈtrɪbjuːtɪd/ | adj. 归因于…的 | The painting is attributed to a little-known Dutch artist of the 17th century.
+profits | /ˈprɒfɪts/ | n. 利润（复数） | The company's profits have doubled over the past five years.
+innovator | /ˈɪnəveɪtə(r)/ | n. 创新者 | He is widely regarded as one of the great innovators in modern computing.`;
+
+/* 单词所属 Week 映射（来自 Semester 2 Vocabulary List）。一个单词可属于多个 Week */
+const WEEK_DATA = {
+  'Week 1':  ['access','adequate','annual','apparent','approximate','attitude','attribute','civil','code','commit','communicate','concentrate','confer','contrast','cycle','debate','despite','dimension','domestic','emerge'],
+  'Week 2':  ['error','ethnic','goal','grant','hence','hypothesis','implement','implicate','impose','integrate','internal','investigate','job','label','mechanism','obvious','occupy','option','output','overall','immerse','pledge','expose','alumni','proponent','opponent','mentor','awareness','species','thrive','ecosystem','advocate','fund','budget','dominate','conflict'],
+  'Week 3':  ['parallel','parameter','phase','predict','principal','prior','professional','project','promote','regime','resolve','retain','series','statistic','status','stress','subsequent','sum','summary','undertake','isolate','cultivate','belong','inclusive','rental','marketplace','initiative','emergency','greenery','shade','pavement','liveable','lane','pedestrian','socialise','block','volunteer'],
+  'Week 4':  ['ethical','prohibit','debate','commitment','perspective','medical','cultivate','authority','strategic','dilemma','nuanced','controversial','misinformation','principle','curate','authenticity','parameter','welfare','adequate','implication','enable'],
+  'Week 5':  ['academy','adjust','alter','amend','aware','capacity','challenge','clause','compound','conflict','consult','contact','decline','discrete','draft','enable','energy','enforce','entity','equivalent','corporate','initiative','intertwine','obligation','quantify','tangible','altruistic','compliance','genuinely','prioritise','exploit','alternative','underestimate','transparent','niche','regulatory','evolution'],
+  'Week 6':  ['evolve','expand','expose','external','facilitate','fundamental','generate','generation','image','liberal','licence','logic','margin','medical','mental','modify','monitor','network','notion','objective','threaten','displace','marine','sanctuary','penalty','framework','coordinate','toxic','deforestation','reforestation','sustainable','certify','alternative','conservation','degradation','eliminate','decompose','contamination'],
+  'Week 7':  ['orient','perspective','precise','prime','psychology','pursue','ratio','reject','revenue','stable','style','substitute','sustain','symbol','target','transit','trend','version','welfare','whereas','creature','regulate','undertake','excessive','alternative','impose','commitment','secure','extinction','entire','survival','decline','nursery','collapse','bleach','promising','crucial','gear','scale','restore'],
+  'Week 8':  ['turnover','apprenticeship','attributed','profits','domain','diverse','innovator','transition','niche','commitment','forecast','target','renowned','launch','over-engineered','layoff','publicity','capital','crowdfunding','incentive','dynamic'],
+  'Week 9':  ['abstract','accurate','acknowledge','aggregate','allocate','assign','attach','author','bond','brief','capable','cite','cooperate','discriminate','display','diverse','domain','edit','enhance','estate','missions','universe','advancement','inspiration','pursue','satellite','cultivate','controversial','backup','agency','progress','oppose','atmosphere','radiation','forecast','critic'],
+  'Week 10': ['exceed','expert','explicit','federal','fee','flexible','furthermore','gender','ignorant','incentive','incidence','incorporate','index','inhibit','initiate','input','instruct','intelligent','interval','lecture','vocational','safety net','overwhelm','mutual respect','holistic','well-being','tuition fees','social inequality','facilitate','refrain','profession','transition','psychology','hypothesis','kinaesthetic','exposure','unique','motivate','underlying','differentiate','auditory'],
+  'Week 11': ['migrate','minimum','ministry','motive','neutral','nevertheless','overseas','precede','presume','rational','recover','reveal','scope','subsidy','tape','trace','transform','transport','underlie','utilize','emerge','commitment','marginalized','instructor','mobility','undermine','motivation','evolution','attainment','autonomy','supervision','mechanism','liberal','pursue','navigate','proficiency','competence','discern','coverage','digital literacy','reputable','sponsor','drastically']
+};
+function getUnitsOf(wordLower) {
+  const r = [];
+  for (const wk in WEEK_DATA) {
+    if (WEEK_DATA[wk].includes(wordLower)) r.push(wk);
+  }
+  return r;
+}
+
+let words = [];      // 全部单词
+let queue = [];      // 未复习队列（索引）
+let knownCount = 0;
+let pendingSet = new Set();   // 标记为待复习的index（当前轮）
+let savedPending = new Set(); // 跨会话持久化的待复习单词（按 word 字符串）
+let currentIdx = null;
+let hintUsed = false;
+let currentMode = 'all';      // 'all' / 'pending' / 'Week 1' ...
+
+/* ============ 持久化 ============ */
+function saveState() {
+  try {
+    localStorage.setItem('vocab_words_s2_ex', JSON.stringify(words));
+  } catch(e){}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('vocab_words_s2_ex');
+    if (s) words = JSON.parse(s);
+  } catch(e){}
+}
+function savePending() {
+  try {
+    localStorage.setItem('vocab_pending_s2', JSON.stringify([...savedPending]));
+  } catch(e){}
+}
+function loadPending() {
+  try {
+    const s = localStorage.getItem('vocab_pending_s2');
+    if (s) savedPending = new Set(JSON.parse(s));
+  } catch(e){}
+}
+function markPending(idx) {
+  pendingSet.add(idx);
+  savedPending.add(words[idx].word);
+  savePending();
+}
+function unmarkPending(idx) {
+  pendingSet.delete(idx);
+  savedPending.delete(words[idx].word);
+  savePending();
+}
+
+/* ============ 解析 ============ */
+function parseWords(text) {
+  const arr = [];
+  text.split(/\r?\n/).forEach(line => {
+    line = line.trim();
+    if (!line) return;
+    const parts = line.split('|').map(s => s.trim());
+    if (!parts[0]) return;
+    const w = parts[0];
+    arr.push({
+      word: w,
+      phonetic: parts[1] || '',
+      meaning: parts[2] || '',
+      example: parts[3] || '',
+      units: getUnitsOf(w.toLowerCase())
+    });
+  });
+  return arr;
+}
+function wordsToText(arr) {
+  return arr.map(w => [w.word, w.phonetic, w.meaning, w.example].join(' | ')).join('\n');
+}
+function getFilteredIndices(mode) {
+  if (mode === 'all') return words.map((_, i) => i);
+  if (mode === 'pending') {
+    return words.map((_, i) => i).filter(i => savedPending.has(words[i].word));
+  }
+  // Week N
+  return words.map((_, i) => i).filter(i => words[i].units && words[i].units.includes(mode));
+}
+
+/* ============ UI 渲染 ============ */
+const main = document.getElementById('main');
+const statsEl = document.getElementById('stats');
+
+function renderHome() {
+  statsEl.style.display = 'none';
+  const count = words.length;
+  const pendingCount = savedPending.size;
+  const weeks = Object.keys(WEEK_DATA);
+  const weekCards = weeks.map(wk => {
+    const n = getFilteredIndices(wk).length;
+    return `<button class="unit-card" onclick="startReview('${wk}')">
+      <div class="unit-name">${wk}</div>
+      <div class="unit-count">${n} 词</div>
+    </button>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="home">
+      <div style="font-size:48px;">📚</div>
+      <h2 style="margin:8px 0 0;">选择复习范围</h2>
+      <p>单词库共 <b>${count}</b> 个单词</p>
+
+      ${pendingCount > 0 ? `
+        <div class="pending-channel" onclick="startReview('pending')">
+          <div style="font-size:28px;">🔁</div>
+          <div style="flex:1;text-align:left;margin-left:14px;">
+            <div style="font-weight:600;color:#92400e;">复习"待复习"单词</div>
+            <div style="font-size:13px;color:#9a3412;">你曾点过 hint 或不会的 <b>${pendingCount}</b> 个单词</div>
+          </div>
+          <div style="color:#92400e;font-size:20px;">→</div>
+        </div>
+      ` : ''}
+
+      <div class="actions" style="margin:18px 0 6px;">
+        <button class="btn-primary" onclick="startReview('all')" ${count===0?'disabled style="opacity:.5;cursor:not-allowed;"':''}>📖 复习全部单词</button>
+        <button class="btn-ghost" onclick="openModal()">管理单词表</button>
+        ${pendingCount > 0 ? '<button class="btn-ghost" onclick="clearPending()">清空待复习</button>' : ''}
+      </div>
+
+      <div class="unit-grid">${weekCards}</div>
+    </div>
+  `;
+}
+
+function clearPending() {
+  if (!confirm('确定清空所有"待复习"标记吗？')) return;
+  savedPending = new Set();
+  savePending();
+  renderHome();
+}
+
+function updateStats() {
+  document.getElementById('remaining').textContent = queue.length;
+  document.getElementById('known').textContent = knownCount;
+  document.getElementById('pending').textContent = savedPending.size;
+}
+
+function renderCard() {
+  if (queue.length === 0) {
+    renderDone();
+    return;
+  }
+  statsEl.style.display = 'flex';
+  currentIdx = queue[0];
+  const w = words[currentIdx];
+  hintUsed = false;
+  const isPending = savedPending.has(w.word);
+  const unitsLabel = (w.units && w.units.length) ? w.units.join(' · ') : '';
+
+  main.innerHTML = `
+    <div class="card">
+      <button class="btn-back" onclick="renderHome()" title="返回主菜单">← 主菜单</button>
+      ${unitsLabel ? `<div class="unit-label">${unitsLabel}</div>` : ''}
+      <div class="word">
+        <span>${escapeHtml(w.word)}</span>
+        <button class="speak-btn" onclick="speak('${escapeJs(w.word)}')" title="朗读">🔊</button>
+        ${isPending ? '<span class="pending-badge">待复习</span>' : ''}
+      </div>
+      <div class="phonetic">${escapeHtml(w.phonetic || '')}</div>
+      <div id="extra"></div>
+      <div class="controls" id="controls">
+        <button class="btn-know" onclick="markKnown()">✓ 认识</button>
+        <button class="btn-hint" onclick="showHint()">💡 hint</button>
+        <button class="btn-dont-know" onclick="showAnswer()">✗ 不会</button>
+      </div>
+    </div>
+  `;
+  updateStats();
+}
+
+function showHint() {
+  const w = words[currentIdx];
+  hintUsed = true;
+  markPending(currentIdx);
+  // 把当前移到队尾
+  queue.shift();
+  queue.push(currentIdx);
+
+  const extra = document.getElementById('extra');
+  let hintHtml;
+  if (w.example) {
+    const re = new RegExp('\\b' + escapeReg(w.word) + '[a-zA-Z]*\\b', 'gi');
+    let sentence = w.example;
+    if (!sentence.includes('___')) {
+      sentence = sentence.replace(re, '_____');
+    }
+    hintHtml = `<div class="hint-box">📌 例句提示：${escapeHtml(sentence)}</div>`;
+  } else {
+    hintHtml = `<div class="hint-box">📌 首字母：<b>${w.word[0]}</b> · 共 ${w.word.length} 个字母</div>`;
+  }
+  extra.innerHTML = hintHtml;
+
+  document.getElementById('controls').innerHTML = `
+    <button class="btn-dont-know" onclick="showAnswer()">✗ 还是不会，看答案</button>
+    <button class="btn-next" onclick="nextCard()">下一个 →</button>
+  `;
+  updateStats();
+}
+
+function showAnswer() {
+  const w = words[currentIdx];
+  markPending(currentIdx);
+  if (!hintUsed) {
+    queue.shift();
+    queue.push(currentIdx);
+  }
+  const extra = document.getElementById('extra');
+  extra.innerHTML = `
+    <div class="meaning-box">
+      📖 ${escapeHtml(w.meaning || '(暂无释义)')}
+      ${w.example ? `<div style="margin-top:6px;color:#047857;font-size:14px;">例：${escapeHtml(w.example)}</div>` : ''}
+    </div>
+  `;
+  document.getElementById('controls').innerHTML = `
+    <button class="btn-next" onclick="nextCard()">下一个 →</button>
+  `;
+  updateStats();
+}
+
+function markKnown() {
+  queue.shift();
+  if (pendingSet.has(currentIdx)) {
+    unmarkPending(currentIdx);
+  }
+  knownCount++;
+  renderCard();
+}
+
+function nextCard() {
+  renderCard();
+}
+
+function renderDone() {
+  statsEl.style.display = 'flex';
+  const modeLabel = currentMode === 'all' ? '全部' : (currentMode === 'pending' ? '待复习' : currentMode);
+  const celebrateSvg = `
+    <img src="celebrate.png" alt="celebrate" style="display:block;margin:0 auto;max-width:220px;height:auto;"/>
+  `;
+
+  main.innerHTML = `
+    <div class="done">
+      ${celebrateSvg}
+      <h2 style="margin:8px 0;">🎉 恭喜完成本轮复习！</h2>
+      <p>范围：<b>${modeLabel}</b>  ·  本轮掌握 <b>${knownCount}</b> 个  ·  待复习剩余 <b>${savedPending.size}</b> 个</p>
+      <div class="controls">
+        <button class="btn-primary" onclick="startReview(currentMode)">再来一轮</button>
+        ${savedPending.size > 0 && currentMode !== 'pending' ? '<button class="btn-hint" onclick="startReview(\'pending\')">🔁 攻克待复习</button>' : ''}
+        <button class="btn-ghost" onclick="renderHome()">返回首页</button>
+      </div>
+    </div>
+  `;
+  updateStats();
+}
+
+/* ============ 流程 ============ */
+function startReview(mode) {
+  mode = mode || 'all';
+  currentMode = mode;
+  const idxs = getFilteredIndices(mode);
+  if (idxs.length === 0) {
+    alert('该范围内没有单词');
+    return;
+  }
+  queue = idxs.slice();
+  for (let i = queue.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [queue[i], queue[j]] = [queue[j], queue[i]];
+  }
+  knownCount = 0;
+  // 当前轮的pendingSet仅用于显示徽章，savedPending做持久化
+  pendingSet = new Set(queue.filter(i => savedPending.has(words[i].word)));
+  renderCard();
+}
+
+/* ============ 朗读 ============ */
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    alert('当前浏览器不支持语音朗读');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+}
+
+/* ============ 弹窗 ============ */
+function openModal() {
+  document.getElementById('wordInput').value = wordsToText(words);
+  document.getElementById('modalMask').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalMask').classList.remove('open');
+}
+function saveWords() {
+  const text = document.getElementById('wordInput').value;
+  words = parseWords(text);
+  saveState();
+  closeModal();
+  renderHome();
+}
+function loadSample() {
+  document.getElementById('wordInput').value = SAMPLE;
+}
+function exportWords() {
+  const blob = new Blob([wordsToText(words)], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vocab.txt';
+  a.click();
+}
+
+/* ============ 工具 ============ */
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escapeJs(s){return String(s).replace(/['\\]/g,'\\$&');}
+function escapeReg(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+/* ============ 启动 ============ */
+loadState();
+loadPending();
+// 如果旧数据没有 units 字段，重建
+const needsRebuild = words.length === 0 || !words[0].units;
+if (needsRebuild) {
+  words = parseWords(SAMPLE);
+  saveState();
+}
+renderHome();
+</script>
+</body>
+</html>
